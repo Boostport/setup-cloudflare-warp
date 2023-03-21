@@ -1,0 +1,17 @@
+name: 'Setup Cloudflare Warp'
+description: 'Sets up the Cloudflare Warp client in your GitHub Actions workflow.'
+inputs:
+  version:
+    description: 'The version of Cloudflare Warp to install'
+  organization:
+    description: 'The name of your Zero Trust organization'
+    required: true
+  auth_client_id:
+    description: 'The service token client id'
+    required: true
+  auth_client_secret:
+    description: 'The service token client secret'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
