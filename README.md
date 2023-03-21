@@ -1,4 +1,5 @@
 # setup-cloudflare-warp
+![Tests](https://github.com/Boostport/setup-cloudflare-warp/actions/workflows/publish.yml/badge.svg)
 The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your GitHub Actions workflow. It allows GitHub
 Actions workflows to access resources that are secured by Cloudflare Zero Trust.
 
@@ -10,8 +11,8 @@ Example:
 uses: Boostport/setup-cloudflare-warp@v1
 with:
   organization: your-organization
-  auth_client_id: ${{ secrets.AUTH_CLIENT_ID }}
-  auth_client_secret: ${{ secrets.AUTH_CLIENT_SECRET }}
+  auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
+  auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
 ```
 You can specify the version of Cloudflare WARP to install:
 ```yaml

@@ -2,11 +2,11 @@
   "name": "setup-cloudflare-warp",
   "version": "1.0.0",
   "description": "GitHub Action to setup Cloudflare Warp",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "lint": "eslint .",
-    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
-    "all": "npm run lint && npm run prepare"
+    "build": "npx @vercel/ncc build",
+    "all": "npm run lint && npm run build"
   },
   "repository": {
     "type": "git",
