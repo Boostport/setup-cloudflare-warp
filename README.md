@@ -1,10 +1,14 @@
 # setup-cloudflare-warp
 ![Tests](https://github.com/Boostport/setup-cloudflare-warp/actions/workflows/publish.yml/badge.svg)
+
 The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your GitHub Actions workflow. It allows GitHub
 Actions workflows to access resources that are secured by Cloudflare Zero Trust.
 
 ## Usage
 This action currently only supports Linux. Contributions to support Microsoft Windows and macOS are welcome.
+
+To use this action, generate a service token using these
+[instructions](https://developers.cloudflare.com/cloudflare-one/identity/service-tokens/) and configure the action:
 
 Example:
 ```yaml
