@@ -1,5 +1,5 @@
 # setup-cloudflare-warp
-![Tests](https://github.com/Boostport/setup-cloudflare-warp/actions/workflows/publish.yml/badge.svg)
+![Tests](https://github.com/Boostport/setup-cloudflare-warp/actions/workflows/tests.yml/badge.svg)
 
 The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your GitHub Actions workflow. It allows GitHub
 Actions workflows to access resources that are secured by Cloudflare Zero Trust.
