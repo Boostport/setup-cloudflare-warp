@@ -24,8 +24,8 @@ uses: Boostport/setup-cloudflare-warp@v1
 with:
   version: 2023.1.133
   organization: your-organization
-  auth_client_id: ${{ secrets.AUTH_CLIENT_ID }}
-  auth_client_secret: ${{ secrets.AUTH_CLIENT_SECRET }}
+  auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
+  auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
 ```
 
 ## Inputs
