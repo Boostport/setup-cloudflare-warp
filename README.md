@@ -33,6 +33,9 @@ with:
 - `organization` - (required) The name of your Cloudflare Zero Trust organization.
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
+- `install_root_certificate` - (optional) Whether to install the Cloudflare Zero Trust root certificate. Defaults to `false`.
+This is only required if TLS decryption is enabled in your Cloudflare Zero Trust organization. See
+[documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/user-side-certificates/install-cloudflare-cert/).
 
 ## Disclaimer
 This is not an official Cloudflare product nor is it endorsed by Cloudflare.

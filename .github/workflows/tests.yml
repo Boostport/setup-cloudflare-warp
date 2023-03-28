@@ -16,9 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - run: npm ci && npm run build
     - uses: ./
       with:
-        version: 2023.1.133
+        version: 2023.3.258
         organization: ${{ secrets.CLOUDFLARE_ORGANIZATION }}
         auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
         auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
+        install_root_certificate: true
+    - run: wget https://www.google.com
