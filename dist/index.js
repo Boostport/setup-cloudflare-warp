@@ -7200,7 +7200,7 @@ async function run() {
   }
 
   try {
-    const version = core.getInput("version", { required: true });
+    const version = core.getInput("version", { required: false });
     const organization = core.getInput("organization", { required: true });
     const auth_client_id = core.getInput("auth_client_id", { required: true });
     const auth_client_secret = core.getInput("auth_client_secret", {
