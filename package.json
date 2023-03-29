@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint .",
-    "build": "npx @vercel/ncc build",
+    "build": "npx @vercel/ncc build ./index.js",
     "all": "npm run lint && npm run build"
   },
   "repository": {
