@@ -7176,6 +7176,22 @@ async function writeConfiguration(
   await exec.exec("sudo mv /tmp/mdm.xml /var/lib/cloudflare-warp/");
 }
 
+async function checkWARPRegistration(organization) {
+  let output = "";
+  const options = {};
+  options.listeners = {
+    stdout: (data) => {
+      output += data.toString();
+    },
+  };
+
+  await exec.exec("warp-cli", ["--accept-tos", "settings"], options);
+
+  if (!output.includes(`Organization: ${organization}`)) {
+    throw new Error("WARP is not connected");
+  }
+}
+
 async function checkWARPConnected() {
   let output = "";
   const options = {};
@@ -7218,7 +7234,7 @@ async function run() {
     }
 
     await writeConfiguration(organization, auth_client_id, auth_client_secret);
-    await exec.exec("warp-cli", ["--accept-tos", "register"]);
+    await (0,backoff.backOff)(() => checkWARPRegistration(organization));
     await exec.exec("warp-cli", ["--accept-tos", "connect"]);
     await (0,backoff.backOff)(() => checkWARPConnected());
   } catch (error) {
