@@ -18,7 +18,8 @@ inputs:
     default: 'false'
 runs:
   using: 'node16'
-  main: 'dist/index.js'
+  main: 'setup/index.js'
+  post: 'cleanup/index.js'
 branding:
   icon: 'cloud'
   color: 'orange'
