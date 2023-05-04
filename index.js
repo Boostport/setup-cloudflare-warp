@@ -8,6 +8,7 @@ import { cleanup, run } from "./lib/setup-cloudflare-warp";
     // Main
     if (!isPost) {
       await run();
+      core.saveState("isPost", "true");
     }
     // Post
     else {

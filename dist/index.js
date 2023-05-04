@@ -7267,6 +7267,7 @@ async function cleanup() {
     // Main
     if (!isPost) {
       await run();
+      core.saveState("isPost", "true");
     }
     // Post
     else {
