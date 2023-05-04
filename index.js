@@ -1,12 +1,12 @@
 import * as core from "@actions/core";
 import { cleanup, run } from "./lib/setup-cloudflare-warp";
 
-export const IsPost = !!core.getState("isPost");
-
 (async () => {
+  const isPost = !!core.getState("isPost");
+
   try {
     // Main
-    if (!IsPost) {
+    if (!isPost) {
       await run();
     }
     // Post
