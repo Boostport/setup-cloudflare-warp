@@ -7237,9 +7237,11 @@ async function run() {
     }
 
     await writeConfiguration(organization, auth_client_id, auth_client_secret);
-    await (0,backoff.backOff)(() => checkWARPRegistration(organization, true));
+    await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
+      numOfAttempts: 20,
+    });
     await exec.exec("warp-cli", ["--accept-tos", "connect"]);
-    await (0,backoff.backOff)(() => checkWARPConnected());
+    await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
   } catch (error) {
     core.error(error);
     throw error;
@@ -7256,6 +7258,7 @@ async function cleanup() {
     throw error;
   }
 }
+
 ;// CONCATENATED MODULE: ./index.js
 
 
