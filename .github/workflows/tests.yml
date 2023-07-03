@@ -19,7 +19,7 @@ jobs:
     - run: npm ci && npm run build
     - uses: ./
       with:
-        version: 2023.3.258
+        version: 2023.3.470
         organization: ${{ secrets.CLOUDFLARE_ORGANIZATION }}
         auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
         auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
