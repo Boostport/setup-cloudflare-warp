@@ -35,6 +35,6 @@
   "devDependencies": {
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.44.0",
-    "prettier": "^2.8.8"
+    "prettier": "^3.0.0"
   }
 }
