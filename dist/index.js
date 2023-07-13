@@ -7171,7 +7171,7 @@ async function writeConfiguration(
   <string>${auth_client_secret}</string>
 </dict>
   `;
-  await io.mkdirP("/var/lib/cloudflare-warp/");
+  await exec.exec("sudo mkdir -p /var/lib/cloudflare-warp/");
   external_fs_.writeFileSync("/tmp/mdm.xml", config);
   await exec.exec("sudo mv /tmp/mdm.xml /var/lib/cloudflare-warp/");
 }
@@ -7230,13 +7230,14 @@ async function run() {
       { required: false }
     );
 
+    await writeConfiguration(organization, auth_client_id, auth_client_secret);
+
     await install(version);
 
     if (install_root_certificate) {
       await installRootCertificate();
     }
 
-    await writeConfiguration(organization, auth_client_id, auth_client_secret);
     await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
       numOfAttempts: 20,
     });
