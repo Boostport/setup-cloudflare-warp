@@ -19,8 +19,8 @@ jobs:
     - run: npm ci && npm run build
     - uses: ./
       with:
-        organization: ${{ secrets.CLOUDFLARE_ORGANIZATION }}
-        auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
-        auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
+        organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
+        auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
+        auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
         install_root_certificate: true
     - run: wget https://www.google.com
