@@ -1946,6 +1946,19 @@ class HttpClientResponse {
             }));
         });
     }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }));
+        });
+    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -2450,7 +2463,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -7255,13 +7274,7 @@ async function checkWARPConnected() {
   }
 }
 
-async function run() {
-  if (process.platform !== "linux") {
-    throw new Error(
-      "Only Linux is supported. Pull requests for other platforms are welcome.",
-    );
-  }
-
+async function linuxWorkflow() {
   try {
     const version = core.getInput("version", { required: false });
     const organization = core.getInput("organization", { required: true });
@@ -7293,6 +7306,82 @@ async function run() {
   }
 }
 
+async function writeMacOSConfiguration(
+  organization,
+  auth_client_id,
+  auth_client_secret
+) {
+  const config = `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>enable</key>
+      <true />
+      <key>organization</key>
+      <string>${organization}</string>
+      <key>auth_client_id</key>
+      <string>${auth_client_id}</string>
+      <key>auth_client_secret</key>
+      <string>${auth_client_secret}</string>
+      <key>service_mode</key>
+      <string>warp</string>
+      <key>auto_connect</key>
+      <integer>1</integer>
+    </dict>
+    </plist>
+  `;
+  await exec.exec('sudo mkdir -p "/Library/Managed Preferences/"');
+  external_fs_.writeFileSync("/tmp/com.cloudflare.warp.plist", config);
+  await exec.exec("plutil -convert binary1 /tmp/com.cloudflare.warp.plist");
+  await exec.exec('sudo mv /tmp/com.cloudflare.warp.plist "/Library/Managed Preferences/"');
+}
+
+async function installMacOSClient() {
+  await exec.exec("brew install --cask cloudflare-warp");
+}
+
+async function macOSWorkflow() {
+  try {
+    const organization = core.getInput("organization", { required: true });
+    const auth_client_id = core.getInput("auth_client_id", { required: true });
+    const auth_client_secret = core.getInput("auth_client_secret", {
+      required: true,
+    });
+
+    await writeMacOSConfiguration(organization, auth_client_id, auth_client_secret);
+
+    await installMacOSClient();
+
+    await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
+      numOfAttempts: 20,
+    });
+    await exec.exec("warp-cli", ["--accept-tos", "connect"]);
+    await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
+  } catch (error) {
+    core.error(error);
+    throw error;
+  }
+}
+
+async function run() {
+  if (!["linux", "darwin"].includes(process.platform)) {
+    throw new Error(
+      "Only Linux and macOS are supported. Pull requests for other platforms are welcome.",
+    );
+  }
+
+  switch (process.platform){
+    case "linux":
+      await linuxWorkflow();
+      break;
+    case "darwin":
+      await macOSWorkflow();
+      break;
+  }
+  
+}
+
 async function cleanup() {
   try {
     await exec.exec("sudo rm /var/lib/cloudflare-warp/mdm.xml");
@@ -7303,7 +7392,6 @@ async function cleanup() {
     throw error;
   }
 }
-
 ;// CONCATENATED MODULE: ./index.js
 
 
