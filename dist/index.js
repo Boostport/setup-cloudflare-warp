@@ -1946,19 +1946,6 @@ class HttpClientResponse {
             }));
         });
     }
-    readBodyBuffer() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-                const chunks = [];
-                this.message.on('data', (chunk) => {
-                    chunks.push(chunk);
-                });
-                this.message.on('end', () => {
-                    resolve(Buffer.concat(chunks));
-                });
-            }));
-        });
-    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -2463,13 +2450,7 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        try {
-            return new URL(proxyVar);
-        }
-        catch (_a) {
-            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
-                return new URL(`http://${proxyVar}`);
-        }
+        return new URL(proxyVar);
     }
     else {
         return undefined;
@@ -7188,7 +7169,7 @@ var backoff = __nccwpck_require__(3183);
 
 
 
-async function install(version) {
+async function installLinuxClient(version) {
   const gpgKeyPath = await tool_cache.downloadTool(
     "https://pkg.cloudflareclient.com/pubkey.gpg",
   );
@@ -7207,19 +7188,15 @@ async function install(version) {
   }
 }
 
-async function installRootCertificate() {
-  const rootCertificatePath = await tool_cache.downloadTool(
-    "https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.pem",
-  );
-
-  await exec.exec(
-    `sudo cp ${rootCertificatePath} /usr/local/share/ca-certificates/Cloudflare_CA.crt`,
-  );
-
-  await exec.exec("sudo update-ca-certificates");
+async function installMacOSClient(version) {
+  if (version === "") {
+    await exec.exec("brew install --cask cloudflare-warp");
+  } else {
+    await exec.exec(`brew install --cask cloudflare-warp@${version}`);
+  }
 }
 
-async function writeConfiguration(
+async function writeLinuxConfiguration(
   organization,
   auth_client_id,
   auth_client_secret,
@@ -7237,6 +7214,39 @@ async function writeConfiguration(
   await exec.exec("sudo mkdir -p /var/lib/cloudflare-warp/");
   external_fs_.writeFileSync("/tmp/mdm.xml", config);
   await exec.exec("sudo mv /tmp/mdm.xml /var/lib/cloudflare-warp/");
+}
+
+async function writeMacOSConfiguration(
+  organization,
+  auth_client_id,
+  auth_client_secret,
+) {
+  const config = `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>enable</key>
+      <true />
+      <key>organization</key>
+      <string>${organization}</string>
+      <key>auth_client_id</key>
+      <string>${auth_client_id}</string>
+      <key>auth_client_secret</key>
+      <string>${auth_client_secret}</string>
+      <key>service_mode</key>
+      <string>warp</string>
+      <key>auto_connect</key>
+      <integer>1</integer>
+    </dict>
+    </plist>
+  `;
+  await exec.exec('sudo mkdir -p "/Library/Managed Preferences/"');
+  external_fs_.writeFileSync("/tmp/com.cloudflare.warp.plist", config);
+  await exec.exec("plutil -convert binary1 /tmp/com.cloudflare.warp.plist");
+  await exec.exec(
+    'sudo mv /tmp/com.cloudflare.warp.plist "/Library/Managed Preferences/"',
+  );
 }
 
 async function checkWARPRegistration(organization, is_registered) {
@@ -7274,7 +7284,13 @@ async function checkWARPConnected() {
   }
 }
 
-async function linuxWorkflow() {
+async function run() {
+  if (!["linux", "darwin"].includes(process.platform)) {
+    throw new Error(
+      "Only Linux and macOS are supported. Pull requests for other platforms are welcome.",
+    );
+  }
+
   try {
     const version = core.getInput("version", { required: false });
     const organization = core.getInput("organization", { required: true });
@@ -7282,17 +7298,24 @@ async function linuxWorkflow() {
     const auth_client_secret = core.getInput("auth_client_secret", {
       required: true,
     });
-    const install_root_certificate = core.getBooleanInput(
-      "install_root_certificate",
-      { required: false },
-    );
 
-    await writeConfiguration(organization, auth_client_id, auth_client_secret);
-
-    await install(version);
-
-    if (install_root_certificate) {
-      await installRootCertificate();
+    switch (process.platform) {
+      case "linux":
+        await writeLinuxConfiguration(
+          organization,
+          auth_client_id,
+          auth_client_secret,
+        );
+        await installLinuxClient(version);
+        break;
+      case "darwin":
+        await writeMacOSConfiguration(
+          organization,
+          auth_client_id,
+          auth_client_secret,
+        );
+        await installMacOSClient(version);
+        break;
     }
 
     await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
@@ -7306,82 +7329,6 @@ async function linuxWorkflow() {
   }
 }
 
-async function writeMacOSConfiguration(
-  organization,
-  auth_client_id,
-  auth_client_secret
-) {
-  const config = `
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-      <key>enable</key>
-      <true />
-      <key>organization</key>
-      <string>${organization}</string>
-      <key>auth_client_id</key>
-      <string>${auth_client_id}</string>
-      <key>auth_client_secret</key>
-      <string>${auth_client_secret}</string>
-      <key>service_mode</key>
-      <string>warp</string>
-      <key>auto_connect</key>
-      <integer>1</integer>
-    </dict>
-    </plist>
-  `;
-  await exec.exec('sudo mkdir -p "/Library/Managed Preferences/"');
-  external_fs_.writeFileSync("/tmp/com.cloudflare.warp.plist", config);
-  await exec.exec("plutil -convert binary1 /tmp/com.cloudflare.warp.plist");
-  await exec.exec('sudo mv /tmp/com.cloudflare.warp.plist "/Library/Managed Preferences/"');
-}
-
-async function installMacOSClient() {
-  await exec.exec("brew install --cask cloudflare-warp");
-}
-
-async function macOSWorkflow() {
-  try {
-    const organization = core.getInput("organization", { required: true });
-    const auth_client_id = core.getInput("auth_client_id", { required: true });
-    const auth_client_secret = core.getInput("auth_client_secret", {
-      required: true,
-    });
-
-    await writeMacOSConfiguration(organization, auth_client_id, auth_client_secret);
-
-    await installMacOSClient();
-
-    await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
-      numOfAttempts: 20,
-    });
-    await exec.exec("warp-cli", ["--accept-tos", "connect"]);
-    await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
-  } catch (error) {
-    core.error(error);
-    throw error;
-  }
-}
-
-async function run() {
-  if (!["linux", "darwin"].includes(process.platform)) {
-    throw new Error(
-      "Only Linux and macOS are supported. Pull requests for other platforms are welcome.",
-    );
-  }
-
-  switch (process.platform){
-    case "linux":
-      await linuxWorkflow();
-      break;
-    case "darwin":
-      await macOSWorkflow();
-      break;
-  }
-  
-}
-
 async function cleanup() {
   try {
     await exec.exec("sudo rm /var/lib/cloudflare-warp/mdm.xml");
@@ -7392,6 +7339,7 @@ async function cleanup() {
     throw error;
   }
 }
+
 ;// CONCATENATED MODULE: ./index.js
 
 
