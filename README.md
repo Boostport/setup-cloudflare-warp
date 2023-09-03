@@ -5,7 +5,7 @@ The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your Git
 Actions workflows to access resources that are secured by Cloudflare Zero Trust.
 
 ## Usage
-This action currently only supports Linux. Contributions to support Microsoft Windows and macOS are welcome.
+This action currently only supports Linux and macOS. Contributions to support Microsoft Windows are welcome.
 
 To use this action, generate a service token using these
 [instructions](https://developers.cloudflare.com/cloudflare-one/identity/service-tokens/) and configure the action:
@@ -33,9 +33,6 @@ with:
 - `organization` - (required) The name of your Cloudflare Zero Trust organization.
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
-- `install_root_certificate` - (optional) Whether to install the Cloudflare Zero Trust root certificate. Defaults to `false`.
-This is only required if TLS decryption is enabled in your Cloudflare Zero Trust organization. See
-[documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/user-side-certificates/install-cloudflare-cert/).
 
 ## Disclaimer
 This is not an official Cloudflare product nor is it endorsed by Cloudflare.

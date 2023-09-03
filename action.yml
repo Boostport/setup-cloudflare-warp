@@ -12,10 +12,6 @@ inputs:
   auth_client_secret:
     description: 'The service token client secret'
     required: true
-  install_root_certificate:
-    description: 'Whether to install the Cloudflare Zero Trust root certificate'
-    required: false
-    default: 'false'
 runs:
   using: 'node16'
   main: 'dist/index.js'
