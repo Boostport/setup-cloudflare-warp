@@ -7350,7 +7350,17 @@ async function run() {
 
 async function cleanup() {
   try {
-    await exec.exec("sudo rm /var/lib/cloudflare-warp/mdm.xml");
+    switch (process.platform) {
+      case "linux":
+        await exec.exec("sudo rm /var/lib/cloudflare-warp/mdm.xml");
+        break;
+      case "darwin":
+        await exec.exec(
+          'sudo rm "/Library/Managed Preferences/com.cloudflare.warp.plist"',
+        );
+        break;
+    }
+
     const organization = core.getInput("organization", { required: true });
     await (0,backoff.backOff)(() => checkWARPRegistration(organization, false));
   } catch (error) {
