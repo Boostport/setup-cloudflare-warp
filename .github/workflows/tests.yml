@@ -13,7 +13,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     - run: npm ci && npm run build
@@ -22,5 +25,4 @@ jobs:
         organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
         auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
         auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
-        install_root_certificate: true
     - run: wget https://www.google.com
