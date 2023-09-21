@@ -558,7 +558,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -7224,15 +7224,18 @@ async function writeLinuxConfiguration(
 <dict>
   <key>organization</key>
   <string>${organization}</string>
+  <key>onboarding</key>
+  <boolean>false</boolean>
   <key>auth_client_id</key>
   <string>${auth_client_id}</string>
   <key>auth_client_secret</key>
   <string>${auth_client_secret}</string>
+  <key>service_mode</key>
+  <string>warp</string>
 </dict>
   `;
   await exec.exec("sudo mkdir -p /var/lib/cloudflare-warp/");
-  external_fs_.writeFileSync("/tmp/mdm.xml", config);
-  await exec.exec("sudo mv /tmp/mdm.xml /var/lib/cloudflare-warp/");
+  external_fs_.writeFileSync("/var/lib/cloudflare-warp/mdm.xml", config);
 }
 
 async function writeMacOSConfiguration(
@@ -7266,6 +7269,10 @@ async function writeMacOSConfiguration(
   await exec.exec(
     'sudo mv /tmp/com.cloudflare.warp.plist "/Library/Managed Preferences/"',
   );
+}
+
+async function registerWARP(organization) {
+  await exec.exec("warp-cli", ["--accept-tos", "teams-enroll", organization]);
 }
 
 async function checkWARPRegistration(organization, is_registered) {
@@ -7305,18 +7312,14 @@ async function checkWARPConnected() {
 
 async function run() {
   if (!["linux", "darwin"].includes(process.platform)) {
-    throw new Error(
-      "Only Linux and macOS are supported. Pull requests for other platforms are welcome.",
-    );
+    throw new Error("Only Linux and macOS are supported. Pull requests for other platforms are welcome.");
   }
 
   try {
     const version = core.getInput("version", { required: false });
     const organization = core.getInput("organization", { required: true });
     const auth_client_id = core.getInput("auth_client_id", { required: true });
-    const auth_client_secret = core.getInput("auth_client_secret", {
-      required: true,
-    });
+    const auth_client_secret = core.getInput("auth_client_secret", { required: true });
 
     switch (process.platform) {
       case "linux":
@@ -7336,6 +7339,8 @@ async function run() {
         await installMacOSClient(version);
         break;
     }
+
+    await registerWARP();
 
     await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
       numOfAttempts: 20,
