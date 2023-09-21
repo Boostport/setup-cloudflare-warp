@@ -7235,7 +7235,8 @@ async function writeLinuxConfiguration(
 </dict>
   `;
   await exec.exec("sudo mkdir -p /var/lib/cloudflare-warp/");
-  external_fs_.writeFileSync("/var/lib/cloudflare-warp/mdm.xml", config);
+  external_fs_.writeFileSync("/tmp/mdm.xml", config);
+  await exec.exec("sudo mv /tmp/mdm.xml /var/lib/cloudflare-warp/");
 }
 
 async function writeMacOSConfiguration(
@@ -7269,10 +7270,6 @@ async function writeMacOSConfiguration(
   await exec.exec(
     'sudo mv /tmp/com.cloudflare.warp.plist "/Library/Managed Preferences/"',
   );
-}
-
-async function registerWARP(organization) {
-  await exec.exec("warp-cli", ["--accept-tos", "teams-enroll", organization]);
 }
 
 async function checkWARPRegistration(organization, is_registered) {
@@ -7339,8 +7336,6 @@ async function run() {
         await installMacOSClient(version);
         break;
     }
-
-    await registerWARP();
 
     await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
       numOfAttempts: 20,
