@@ -1,38 +1,35 @@
 # setup-cloudflare-warp
-![Tests](https://github.com/Boostport/setup-cloudflare-warp/actions/workflows/tests.yml/badge.svg)
+[![Cloud-Team](https://img.shields.io/badge/CloudTeam-black.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/mollerdigital/teams/cloud-team) <br />
+This action sets up Cloudflare Warp and allows the workflow to connect to Møller private resources in both Azure and On-Premise.
 
-The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your GitHub Actions workflow. It allows GitHub
-Actions workflows to access resources that are secured by Cloudflare Zero Trust.
-
-## Usage
-This action currently only supports Linux and macOS. Contributions to support Microsoft Windows are welcome.
-
-To use this action, generate a service token using these
-[instructions](https://developers.cloudflare.com/cloudflare-one/identity/service-tokens/) and configure the action:
+## Pre-requisites
+This action currently only supports Linux and macOS. Your repository must also have the option `enable_cloudflare_warp` set to `true`. See Cloud-Applications for more information. 
 
 Example:
 ```yaml
-uses: Boostport/setup-cloudflare-warp@v1
+uses: mollerdigital/setup-cloudflare-warp@v1
 with:
-  organization: your-organization
+  organization: moller
   auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
   auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
 ```
 You can specify the version of Cloudflare WARP to install:
 ```yaml
-uses: Boostport/setup-cloudflare-warp@v1
+uses: mollerdigital/setup-cloudflare-warp@v1
 with:
   version: 2023.1.133
-  organization: your-organization
+  organization: moller
   auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
   auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
 ```
 
 ## Inputs
 - `version` - (optional) The version of Cloudflare WARP to install. Defaults to the latest version.
-- `organization` - (required) The name of your Cloudflare Zero Trust organization.
+- `organization` - (required) The name of your Cloudflare Zero Trust organization. This is always "moller".
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
 
 ## Disclaimer
-This is not an official Cloudflare product nor is it endorsed by Cloudflare.
+This is not an official Cloudflare product nor is it endorsed by Cloudflare. This project is a fork from the `Boostport/setup-cloudflare-warp`. 
+Most code is identical in this repository besides from the examples and some Møller specific setup that is required for this to work 
+in our tenant and setup.
