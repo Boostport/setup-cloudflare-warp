@@ -1,0 +1,33 @@
+name: "pull requests"
+on:
+  pull_request_target:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    environment:
+      name: "Acceptance Tests"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: npm ci
+      - run: npm run lint
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: "Acceptance Tests"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: npm ci && npm run build
+      - uses: ./
+        with:
+          organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
+          auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
+          auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+      - run: wget https://www.google.com
