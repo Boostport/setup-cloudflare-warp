@@ -3,23 +3,29 @@ on:
   pull_request_target:
 
 jobs:
-  lint:
+  approve-pr-tests:
     runs-on: ubuntu-latest
     environment:
-      name: "Acceptance Tests"
+      name: "Pull Request Tests"
+    steps:
+      - run: "echo 'Execution of tests pending approval'"
+
+  lint:
+    needs: ["approve-pr-tests"]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: npm ci
       - run: npm run lint
+
   test:
+    needs: ["approve-pr-tests", "lint"]
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    environment:
-      name: "Acceptance Tests"
     steps:
       - uses: actions/checkout@v4
         with:
