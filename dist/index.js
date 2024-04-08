@@ -30932,6 +30932,7 @@ async function installLinuxClient(version) {
 }
 
 async function installMacOSClient(version) {
+  await exec.exec("brew update");
   if (version === "") {
     await exec.exec("brew install --cask cloudflare-warp");
   } else {
