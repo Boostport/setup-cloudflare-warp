@@ -30912,6 +30912,11 @@ var backoff = __nccwpck_require__(3183);
 
 
 
+const backoffOptions = {
+  numOfAttempts: 10,
+  maxDelay: 4000,
+};
+
 async function installLinuxClient(version) {
   const gpgKeyPath = await tool_cache.downloadTool(
     "https://pkg.cloudflareclient.com/pubkey.gpg",
@@ -30932,6 +30937,7 @@ async function installLinuxClient(version) {
 }
 
 async function installMacOSClient(version) {
+  await exec.exec("brew update");
   if (version === "") {
     await exec.exec("brew install --cask cloudflare-warp");
   } else {
@@ -31060,11 +31066,12 @@ async function run() {
       break;
   }
 
-  await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
-    numOfAttempts: 20,
-  });
+  await (0,backoff.backOff)(
+    () => checkWARPRegistration(organization, true),
+    backoffOptions,
+  );
   await exec.exec("warp-cli", ["--accept-tos", "connect"]);
-  await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
+  await (0,backoff.backOff)(() => checkWARPConnected(), backoffOptions);
   core.saveState("connected", "true");
 }
 
@@ -31083,7 +31090,10 @@ async function cleanup() {
   const connected = !!core.getState("connected");
   if (connected) {
     const organization = core.getInput("organization", { required: true });
-    await (0,backoff.backOff)(() => checkWARPRegistration(organization, false));
+    await (0,backoff.backOff)(
+      () => checkWARPRegistration(organization, false),
+      backoffOptions,
+    );
   }
 }
 
