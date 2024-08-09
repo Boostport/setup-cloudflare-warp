@@ -30912,6 +30912,11 @@ var backoff = __nccwpck_require__(3183);
 
 
 
+const backoffOptions = {
+  numOfAttempts: 10,
+  maxDelay: 4000,
+};
+
 async function installLinuxClient(version) {
   const gpgKeyPath = await tool_cache.downloadTool(
     "https://pkg.cloudflareclient.com/pubkey.gpg",
@@ -30932,11 +30937,21 @@ async function installLinuxClient(version) {
 }
 
 async function installMacOSClient(version) {
+  await exec.exec("brew update");
   if (version === "") {
     await exec.exec("brew install --cask cloudflare-warp");
   } else {
     await exec.exec(`brew install --cask cloudflare-warp@${version}`);
   }
+}
+
+async function installWindowsClient(version) {
+  if (version) {
+    await exec.exec(`choco install -y warp --no-progress --version=${version}`);
+  } else {
+    await exec.exec("choco install -y --no-progress warp");
+  }
+  core.addPath("C:\\Program Files\\Cloudflare\\Cloudflare WARP\\");
 }
 
 async function writeLinuxConfiguration(
@@ -30992,6 +31007,25 @@ async function writeMacOSConfiguration(
   );
 }
 
+async function writeWindowsConfiguration(
+  organization,
+  auth_client_id,
+  auth_client_secret,
+) {
+  const config = `
+<dict>
+    <key>organization</key>
+    <string>${organization}</string>
+    <key>auth_client_id</key>
+    <string>${auth_client_id}</string>
+    <key>auth_client_secret</key>
+    <string>${auth_client_secret}</string>
+</dict>`;
+  if (!external_fs_.existsSync("C:\\ProgramData\\Cloudflare"))
+    external_fs_.mkdirSync("C:\\ProgramData\\Cloudflare");
+  external_fs_.writeFileSync("C:\\ProgramData\\Cloudflare\\mdm.xml", config);
+}
+
 async function checkWARPRegistration(organization, is_registered) {
   let output = "";
   const options = {};
@@ -31022,15 +31056,23 @@ async function checkWARPConnected() {
 
   await exec.exec("warp-cli", ["--accept-tos", "status"], options);
 
+  // Retry connect on missing registration
+  if (output.includes("Reason: Registration Missing")) {
+    await exec.exec("warp-cli", ["--accept-tos", "connect"]);
+    await exec.exec("warp-cli", ["--accept-tos", "status"], options);
+  }
+
   if (!output.includes("Status update: Connected")) {
     throw new Error("WARP is not connected");
   }
 }
 
 async function run() {
-  if (!["linux", "darwin"].includes(process.platform)) {
+  if (!["linux", "darwin", "win32"].includes(process.platform)) {
     throw new Error(
-      "Only Linux and macOS are supported. Pull requests for other platforms are welcome.",
+      "Only Windows, Linux and macOS are supported. Pull requests for other platforms are welcome. (Platform is " +
+        process.platform +
+        ")",
     );
   }
 
@@ -31058,13 +31100,22 @@ async function run() {
       );
       await installMacOSClient(version);
       break;
+    case "win32":
+      await writeWindowsConfiguration(
+        organization,
+        auth_client_id,
+        auth_client_secret,
+      );
+      await installWindowsClient(version);
+      break;
   }
 
-  await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
-    numOfAttempts: 20,
-  });
+  await (0,backoff.backOff)(
+    () => checkWARPRegistration(organization, true),
+    backoffOptions,
+  );
   await exec.exec("warp-cli", ["--accept-tos", "connect"]);
-  await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
+  await (0,backoff.backOff)(() => checkWARPConnected(), backoffOptions);
   core.saveState("connected", "true");
 }
 
@@ -31078,12 +31129,18 @@ async function cleanup() {
         'sudo rm "/Library/Managed Preferences/com.cloudflare.warp.plist"',
       );
       break;
+    case "win32":
+      await exec.exec("rm C:\\ProgramData\\Cloudflare\\mdm.xml");
+      break;
   }
 
   const connected = !!core.getState("connected");
   if (connected) {
     const organization = core.getInput("organization", { required: true });
-    await (0,backoff.backOff)(() => checkWARPRegistration(organization, false));
+    await (0,backoff.backOff)(
+      () => checkWARPRegistration(organization, false),
+      backoffOptions,
+    );
   }
 }
 
