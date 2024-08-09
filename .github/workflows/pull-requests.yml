@@ -24,7 +24,7 @@ jobs:
     needs: ["approve-pr-tests", "lint"]
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -36,4 +36,4 @@ jobs:
           organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
           auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
           auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
-      - run: wget https://www.google.com
+      - run: curl -I https://www.google.com
