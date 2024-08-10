@@ -5,7 +5,7 @@ The `Boostport/setup-cloudflare-warp` action sets up Cloudflare WARP in your Git
 Actions workflows to access resources that are secured by Cloudflare Zero Trust.
 
 ## Usage
-This action currently only supports Linux and macOS. Contributions to support Microsoft Windows are welcome.
+This action currently only supports Linux, macOS and Windows. Contributions to support Microsoft Windows are welcome.
 
 To use this action, generate a service token using these
 [instructions](https://developers.cloudflare.com/cloudflare-one/identity/service-tokens/) and configure the action:
