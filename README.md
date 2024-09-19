@@ -34,6 +34,16 @@ with:
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
 
+## Cloudflare Permissions
+> [!TIP]
+> Failure to set the proper permission will result in a `Status update: Unable to connect. Reason: Registration Missing` error.
+
+Under `Zero Trust > Settings > WARP Client > Device enrollment permissions` a policies rule must have `SERVICE AUTH` set as the rule action.
+![Cloudflare Device Enrollment Policy](./docs/resources/cloudflare_device_enrollment.png)
+
+To add the GitHub action to a WARP Client Profile, you must specify the expression of the policy to `User Email`, `is`, `non_identity@<INSERT YOUR ORG>.cloudflareaccess.com`.
+
+
 ## Troubleshooting
 - Unable to connect: `Status update: Unable to connect. Reason: Registration Missing` errors
   - Check that the service token is valid and not expired.
