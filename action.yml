@@ -12,6 +12,9 @@ inputs:
   auth_client_secret:
     description: 'The service token client secret'
     required: true
+  configure_docker_dns:
+    description: 'Configure Docker to use Cloudflare WARP for DNS resolution'
+    default: 'false'
 runs:
   using: 'node20'
   main: 'dist/index.js'
