@@ -36,4 +36,5 @@ jobs:
           organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
           auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
           auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+          configure_docker_dns: true
       - run: curl -I https://www.google.com
