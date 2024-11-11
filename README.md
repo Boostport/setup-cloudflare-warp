@@ -33,6 +33,7 @@ with:
 - `organization` - (required) The name of your Cloudflare Zero Trust organization.
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
+- `configure_docker_dns` - (optional) Configure Docker to use Cloudflare WARP for DNS resolution. Defaults to `false`.
 
 ## Cloudflare Permissions
 > [!TIP]
