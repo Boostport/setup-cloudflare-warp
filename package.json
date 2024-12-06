@@ -37,6 +37,6 @@
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
-    "prettier": "^3.4.1"
+    "prettier": "^3.4.2"
   }
 }
