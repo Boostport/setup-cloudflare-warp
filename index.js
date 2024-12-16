@@ -8,7 +8,6 @@ import { cleanup, run } from "./lib/setup-cloudflare-warp";
     // Main
     if (!isPost) {
       await run();
-      core.saveState("isPost", "true");
     }
     // Post
     else {
@@ -16,5 +15,9 @@ import { cleanup, run } from "./lib/setup-cloudflare-warp";
     }
   } catch (error) {
     core.setFailed(error.message);
+  }
+
+  if (!isPost) {
+    core.saveState("isPost", "true");
   }
 })();
