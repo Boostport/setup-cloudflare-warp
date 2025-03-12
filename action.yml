@@ -15,6 +15,9 @@ inputs:
   configure_docker_dns:
     description: 'Configure Docker to use Cloudflare WARP for DNS resolution'
     default: 'false'
+  unique_client_id:
+    description: 'A unique identifier for the client device'
+    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
