@@ -28,11 +28,22 @@ with:
   auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
 ```
 
+You can also specify a unique client identifier for the device:
+```yaml
+uses: Boostport/setup-cloudflare-warp@v1
+with:
+  organization: your-organization
+  auth_client_id: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_ID }}
+  auth_client_secret: ${{ secrets.CLOUDFLARE_AUTH_CLIENT_SECRET }}
+  unique_client_id: bc6ea6f6-a7c9-4da0-b303-69f5481803b8
+```
+
 ## Inputs
 - `version` - (optional) The version of Cloudflare WARP to install. Defaults to the latest version.
 - `organization` - (required) The name of your Cloudflare Zero Trust organization.
 - `auth_client_id` - (required) The service token client id.
 - `auth_client_secret` - (required) The service token client secret.
+- `unique_client_id` - (optional) A unique identifier for the client device. See [Cloudflare documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/deployment/mdm-deployment/parameters/#unique_client_id) for more details.
 - `configure_docker_dns` - (optional) *Linux Only* Configure Docker to use Cloudflare WARP for DNS resolution. Defaults to `false`.
 
 ## Cloudflare Permissions
