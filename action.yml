@@ -18,6 +18,9 @@ inputs:
   unique_client_id:
     description: 'A unique identifier for the client device'
     required: false
+  vnet:
+    description: 'The Virtual Network ID that you wish to use'
+    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
