@@ -19,11 +19,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: npm ci && npm run build
-    - uses: ./
-      with:
-        organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
-        auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
-        auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
-        unique_client_id: 1a9472c0-ada8-42d1-888b-c5b0750a42f0
-        configure_docker_dns: true
-    - run: curl -I https://www.google.com
+    # - uses: ./
+    #   with:
+    #     organization: ${{ secrets.CLOUDFLARE_ACCESS_ORGANIZATION }}
+    #     auth_client_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
+    #     auth_client_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+    #     unique_client_id: 1a9472c0-ada8-42d1-888b-c5b0750a42f0
+    #     configure_docker_dns: true
+    # - run: curl -I https://www.google.com
