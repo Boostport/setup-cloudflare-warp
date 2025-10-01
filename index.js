@@ -4,17 +4,21 @@ import { cleanup, run } from "./lib/setup-cloudflare-warp";
 (async () => {
   const isPost = !!core.getState("isPost");
 
-  try {
-    // Main
-    if (!isPost) {
+  // Main
+  if (!isPost) {
+    try {
       await run();
+    } catch (error) {
+      core.setFailed(error.message);
     }
-    // Post
-    else {
+  }
+  // Post
+  else {
+    try {
       await cleanup();
+    } catch {
+      // Silently ignore cleanup errors
     }
-  } catch (error) {
-    core.setFailed(error.message);
   }
 
   if (!isPost) {
