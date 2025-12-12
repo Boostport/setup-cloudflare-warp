@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/Boostport/setup-cloudflare-warp#readme",
   "dependencies": {
-    "@actions/core": "^2.0.0",
+    "@actions/core": "^2.0.1",
     "@actions/exec": "^2.0.0",
     "@actions/io": "^2.0.0",
     "@actions/tool-cache": "^2.0.2",
