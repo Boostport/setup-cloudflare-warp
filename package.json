@@ -28,7 +28,7 @@
   "dependencies": {
     "@actions/core": "^2.0.3",
     "@actions/exec": "^3.0.0",
-    "@actions/io": "^2.0.0",
+    "@actions/io": "^3.0.2",
     "@actions/tool-cache": "^3.0.1",
     "exponential-backoff": "^3.1.3"
   },
