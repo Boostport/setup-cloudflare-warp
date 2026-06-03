@@ -15,6 +15,12 @@ inputs:
   configure_docker_dns:
     description: 'Configure Docker to use Cloudflare WARP for DNS resolution'
     default: 'false'
+  docker_bip:
+    description: 'Bridge IP for the default Docker network in CIDR notation (e.g. 192.168.200.1/24). Sets the bip in the Docker daemon configuration and uses its address as the DNS resolver IP. Requires configure_docker_dns to be enabled.'
+    required: false
+  docker_default_address_pools:
+    description: 'Address pools for Docker user-defined networks, as one or more "<base-cidr>,<subnet-size>" pairs separated by semicolons (e.g. 192.168.204.0/22,24). Sets default-address-pools in the Docker daemon configuration. Only affects networks created after this action runs. Requires configure_docker_dns to be enabled.'
+    required: false
   unique_client_id:
     description: 'A unique identifier for the client device'
     required: false
