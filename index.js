@@ -3,7 +3,7 @@ import { cleanup, run } from "./lib/setup-cloudflare-warp";
 
 (async () => {
   const isPost = !!core.getState("isPost");
-
+  console.log("test");
   try {
     // Main
     if (!isPost) {
